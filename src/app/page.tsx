@@ -1,12 +1,10 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useMemo } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Fingerprint, Loader2, MapPin, ShoppingBag, User } from "lucide-react";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import { collection, addDoc, serverTimestamp, query, orderBy } from "firebase/firestore";
 
 import { Button } from "@/components/ui/button";
@@ -42,8 +40,12 @@ export default function CheckInPage() {
   const { toast } = useToast();
   const firestore = useFirestore();
 
-  const logsCollection = firestore ? collection(firestore, "logs") : null;
-  const logsQuery = logsCollection ? query(logsCollection, orderBy("timestamp", "desc")) : null;
+  const logsQuery = useMemo(() => {
+    if (!firestore) return null;
+    const logsCollection = collection(firestore, "logs");
+    return query(logsCollection, orderBy("timestamp", "desc"));
+  }, [firestore]);
+  
   const { data: activityLog, loading: logsLoading } = useCollection<LogEntry>(logsQuery);
 
 
@@ -59,7 +61,8 @@ export default function CheckInPage() {
     setIsCheckingIn(true);
 
     const addLogEntry = async (status: LogEntry["status"], details: string) => {
-      if (!logsCollection) return;
+      if (!firestore) return;
+      const logsCollection = collection(firestore, "logs");
       try {
         await addDoc(logsCollection, {
           ...values,
