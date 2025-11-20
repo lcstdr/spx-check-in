@@ -1,10 +1,13 @@
+
 rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow public read and write access to the logs collection
+    // Permitir que qualquer pessoa crie um log (faça check-in)
     match /logs/{logId} {
-      allow read, write: if true;
+      allow create: if true;
+      // Apenas usuários autenticados (admins) podem ler, atualizar ou deletar logs
+      allow read, update, delete: if request.auth != null;
     }
   }
 }

@@ -1,11 +1,14 @@
+
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Fingerprint, Loader2, MapPin, ShoppingBag, User } from "lucide-react";
-import { collection, addDoc, serverTimestamp, query, orderBy } from "firebase/firestore";
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { GoogleAuthProvider, signInWithPopup, signOut } from "firebase/auth";
+import Link from "next/link";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -27,8 +30,8 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { verifyLocation } from "@/lib/geolocation";
-import { ActivityLog, LogEntry } from "@/components/activity-log";
-import { useFirestore, useCollection } from "@/firebase";
+import { LogEntry } from "@/components/activity-log";
+import { useFirestore, useAuth, useUser } from "@/firebase";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "O nome deve ter pelo menos 2 caracteres." }),
@@ -39,15 +42,8 @@ export default function CheckInPage() {
   const [isCheckingIn, setIsCheckingIn] = useState(false);
   const { toast } = useToast();
   const firestore = useFirestore();
-
-  const logsQuery = useMemo(() => {
-    if (!firestore) return null;
-    const logsCollection = collection(firestore, "logs");
-    return query(logsCollection, orderBy("timestamp", "desc"));
-  }, [firestore]);
-  
-  const { data: activityLog, loading: logsLoading } = useCollection<LogEntry>(logsQuery);
-
+  const auth = useAuth();
+  const { user } = useUser();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -56,6 +52,25 @@ export default function CheckInPage() {
       id: "",
     },
   });
+
+  const handleGoogleLogin = async () => {
+    if (!auth) return;
+    const provider = new GoogleAuthProvider();
+    try {
+      await signInWithPopup(auth, provider);
+      toast({ title: "Login realizado com sucesso!" });
+    } catch (error) {
+      console.error("Erro no login com Google:", error);
+      toast({ variant: "destructive", title: "Erro no Login", description: "Não foi possível fazer login com o Google." });
+    }
+  };
+
+  const handleLogout = async () => {
+    if (!auth) return;
+    await signOut(auth);
+    toast({ title: "Você foi desconectado." });
+  };
+
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsCheckingIn(true);
@@ -128,6 +143,18 @@ export default function CheckInPage() {
 
   return (
     <main className="container mx-auto flex min-h-screen flex-col items-center p-4 py-8 sm:p-12">
+      <header className="w-full flex justify-end mb-4">
+        {user ? (
+          <div className="flex items-center gap-4">
+            <Link href="/admin">
+              <Button variant="outline">Painel do Administrador</Button>
+            </Link>
+            <Button onClick={handleLogout} variant="ghost">Sair</Button>
+          </div>
+        ) : (
+          <Button onClick={handleGoogleLogin}>Login de Administrador</Button>
+        )}
+      </header>
       <div className="flex flex-col items-center text-center mb-8">
         <div className="mb-4 rounded-full bg-primary/10 p-3">
             <ShoppingBag className="h-12 w-12 text-primary" />
@@ -202,11 +229,6 @@ export default function CheckInPage() {
           </form>
         </Form>
       </Card>
-
-      <div className="w-full max-w-4xl mt-12">
-        <h2 className="text-2xl font-headline font-bold text-center">Registro de Atividades</h2>
-        <ActivityLog logs={activityLog || []} loading={logsLoading} />
-      </div>
 
     </main>
   );

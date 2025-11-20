@@ -1,3 +1,4 @@
+
 {
   "entities": {
     "log": {
@@ -32,7 +33,7 @@
     }
   },
   "auth": {
-    "providers": []
+    "providers": ["google.com"]
   },
   "firestore": {
     "/logs/{logId}": {
