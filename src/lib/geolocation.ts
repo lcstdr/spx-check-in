@@ -1,10 +1,10 @@
 // Mauá, SP, Brazil coordinates for LSP64
 const TARGET_LOCATION = {
-  latitude: -23.6675,
-  longitude: -46.4608,
+  latitude: -23.695894774817393,
+  longitude: -46.48067147301383,
 };
 
-const MAX_DISTANCE_METERS = 500; // 500 meters radius
+const MAX_DISTANCE_METERS = 5000; // 5000 meters radius
 
 function toRadians(degrees: number): number {
   return degrees * (Math.PI / 180);
