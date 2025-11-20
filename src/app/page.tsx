@@ -124,7 +124,7 @@ export default function CheckInPage() {
             <ShoppingBag className="h-12 w-12 text-primary" />
         </div>
         <h1 className="text-4xl font-headline font-bold text-primary">
-          Hub de Check-in SPX
+          SPX CHECK-IN MAUÁ
         </h1>
         <p className="text-muted-foreground mt-2 max-w-md">
           MAUÁ LSP64 - Check-in automático por geolocalização para membros da equipe.
