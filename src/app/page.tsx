@@ -6,6 +6,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Fingerprint, Loader2, MapPin, ShoppingBag, User } from "lucide-react";
 import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -30,15 +31,15 @@ import { verifyLocation } from "@/lib/geolocation";
 import { ActivityLog } from "@/components/activity-log";
 
 const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters." }),
-  id: z.string().min(1, { message: "ID is required." }),
+  name: z.string().min(2, { message: "O nome deve ter pelo menos 2 caracteres." }),
+  id: z.string().min(1, { message: "O ID é obrigatório." }),
 });
 
 export type LogEntry = {
   name: string;
   id: string;
   timestamp: string;
-  status: "Success" | "Failed" | "Error";
+  status: "Sucesso" | "Falhou" | "Erro";
   details: string;
 };
 
@@ -64,7 +65,7 @@ export default function CheckInPage() {
           ...values,
           status,
           details,
-          timestamp: format(new Date(), "PPpp"),
+          timestamp: format(new Date(), "PPpp", { locale: ptBR }),
         },
         ...prev,
       ]);
@@ -73,10 +74,10 @@ export default function CheckInPage() {
     if (!navigator.geolocation) {
       toast({
         variant: "destructive",
-        title: "Geolocation Error",
-        description: "Your browser does not support geolocation.",
+        title: "Erro de Geolocalização",
+        description: "Seu navegador não suporta geolocalização.",
       });
-      addLogEntry("Error", "Browser does not support geolocation.");
+      addLogEntry("Erro", "Navegador não suporta geolocalização.");
       setIsCheckingIn(false);
       return;
     }
@@ -88,17 +89,17 @@ export default function CheckInPage() {
 
         if (isInRange) {
           toast({
-            title: "Check-in Successful!",
-            description: `Welcome, ${values.name}. You are within the designated area.`,
+            title: "Check-in Realizado com Sucesso!",
+            description: `Bem-vindo, ${values.name}. Você está dentro da área designada.`,
           });
-          addLogEntry("Success", `Checked in ${distance}m from target.`);
+          addLogEntry("Sucesso", `Check-in a ${distance}m do alvo.`);
         } else {
           toast({
             variant: "destructive",
-            title: "Check-in Failed",
-            description: `You are too far from the location.`,
+            title: "Falha no Check-in",
+            description: `Você está muito longe do local.`,
           });
-          addLogEntry("Failed", `User is ${distance}m away from target.`);
+          addLogEntry("Falhou", `Usuário está a ${distance}m de distância do alvo.`);
         }
         setIsCheckingIn(false);
         form.reset();
@@ -106,10 +107,10 @@ export default function CheckInPage() {
       (error) => {
         toast({
           variant: "destructive",
-          title: "Geolocation Error",
+          title: "Erro de Geolocalização",
           description: error.message,
         });
-        addLogEntry("Error", error.message);
+        addLogEntry("Erro", error.message);
         setIsCheckingIn(false);
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
@@ -123,18 +124,18 @@ export default function CheckInPage() {
             <ShoppingBag className="h-12 w-12 text-primary" />
         </div>
         <h1 className="text-4xl font-headline font-bold text-primary">
-          SPX Check-in Hub
+          Hub de Check-in SPX
         </h1>
         <p className="text-muted-foreground mt-2 max-w-md">
-          MAUÁ LSP64 - Automatic geolocation check-in for team members.
+          MAUÁ LSP64 - Check-in automático por geolocalização para membros da equipe.
         </p>
       </div>
 
       <Card className="w-full max-w-md shadow-lg">
         <CardHeader>
-          <CardTitle>Enter Your Details</CardTitle>
+          <CardTitle>Insira Seus Dados</CardTitle>
           <CardDescription>
-            We'll automatically verify your location for check-in.
+            Nós verificaremos sua localização automaticamente para o check-in.
           </CardDescription>
         </CardHeader>
         <Form {...form}>
@@ -145,11 +146,11 @@ export default function CheckInPage() {
                 name="name"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Full Name</FormLabel>
+                    <FormLabel>Nome Completo</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <User className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input placeholder="e.g. João da Silva" {...field} className="pl-9" />
+                        <Input placeholder="ex: João da Silva" {...field} className="pl-9" />
                       </div>
                       
                     </FormControl>
@@ -162,11 +163,11 @@ export default function CheckInPage() {
                 name="id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Employee ID</FormLabel> TSC
+                    <FormLabel>ID do Funcionário</FormLabel> TSC
                     <FormControl>
                       <div className="relative">
                         <Fingerprint className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                        <Input placeholder="e.g. SPX123456" {...field} className="pl-9" />
+                        <Input placeholder="ex: SPX123456" {...field} className="pl-9" />
                       </div>
                     </FormControl>
                     <FormMessage />
@@ -179,12 +180,12 @@ export default function CheckInPage() {
                 {isCheckingIn ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Verifying Location...
+                    Verificando Localização...
                   </>
                 ) : (
                   <>
                     <MapPin className="mr-2 h-4 w-4" />
-                    Check-in
+                    Fazer Check-in
                   </>
                 )}
               </Button>
@@ -194,7 +195,7 @@ export default function CheckInPage() {
       </Card>
 
       <div className="w-full max-w-4xl mt-12">
-        <h2 className="text-2xl font-headline font-bold text-center">Activity Log</h2>
+        <h2 className="text-2xl font-headline font-bold text-center">Registro de Atividades</h2>
         <ActivityLog logs={activityLog} />
       </div>
 

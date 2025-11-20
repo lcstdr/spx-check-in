@@ -19,7 +19,7 @@ export function ActivityLog({ logs }: ActivityLogProps) {
   if (logs.length === 0) {
     return (
       <div className="mt-8 rounded-lg border bg-card p-8 text-center text-muted-foreground">
-        No check-in activity yet.
+        Nenhuma atividade de check-in ainda.
       </div>
     );
   }
@@ -29,11 +29,11 @@ export function ActivityLog({ logs }: ActivityLogProps) {
       <Table>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[150px]">Name</TableHead>
+            <TableHead className="w-[150px]">Nome</TableHead>
             <TableHead className="w-[100px]">ID</TableHead>
-            <TableHead>Timestamp</TableHead>
+            <TableHead>Horário</TableHead>
             <TableHead>Status</TableHead>
-            <TableHead className="text-right">Details</TableHead>
+            <TableHead className="text-right">Detalhes</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -43,7 +43,7 @@ export function ActivityLog({ logs }: ActivityLogProps) {
               <TableCell>{log.id}</TableCell>
               <TableCell>{log.timestamp}</TableCell>
               <TableCell>
-                <Badge variant={log.status === "Success" ? "secondary" : "destructive"}>
+                <Badge variant={log.status === "Sucesso" ? "secondary" : "destructive"}>
                   {log.status}
                 </Badge>
               </TableCell>
