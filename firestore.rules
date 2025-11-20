@@ -1,0 +1,10 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow public read and write access to the logs collection
+    match /logs/{logId} {
+      allow read, write: if true;
+    }
+  }
+}

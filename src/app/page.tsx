@@ -1,12 +1,13 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Fingerprint, Loader2, MapPin, ShoppingBag, User } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { collection, addDoc, serverTimestamp, query, orderBy } from "firebase/firestore";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -28,25 +29,23 @@ import {
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
 import { verifyLocation } from "@/lib/geolocation";
-import { ActivityLog } from "@/components/activity-log";
+import { ActivityLog, LogEntry } from "@/components/activity-log";
+import { useFirestore, useCollection } from "@/firebase";
 
 const formSchema = z.object({
   name: z.string().min(2, { message: "O nome deve ter pelo menos 2 caracteres." }),
   id: z.string().min(1, { message: "O ID é obrigatório." }),
 });
 
-export type LogEntry = {
-  name: string;
-  id: string;
-  timestamp: string;
-  status: "Sucesso" | "Falhou" | "Erro";
-  details: string;
-};
-
 export default function CheckInPage() {
   const [isCheckingIn, setIsCheckingIn] = useState(false);
-  const [activityLog, setActivityLog] = useState<LogEntry[]>([]);
   const { toast } = useToast();
+  const firestore = useFirestore();
+
+  const logsCollection = firestore ? collection(firestore, "logs") : null;
+  const logsQuery = logsCollection ? query(logsCollection, orderBy("timestamp", "desc")) : null;
+  const { data: activityLog, loading: logsLoading } = useCollection<LogEntry>(logsQuery);
+
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -56,19 +55,26 @@ export default function CheckInPage() {
     },
   });
 
-  function onSubmit(values: z.infer<typeof formSchema>) {
+  async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsCheckingIn(true);
 
-    const addLogEntry = (status: LogEntry["status"], details: string) => {
-      setActivityLog((prev) => [
-        {
+    const addLogEntry = async (status: LogEntry["status"], details: string) => {
+      if (!logsCollection) return;
+      try {
+        await addDoc(logsCollection, {
           ...values,
           status,
           details,
-          timestamp: format(new Date(), "PPpp", { locale: ptBR }),
-        },
-        ...prev,
-      ]);
+          timestamp: serverTimestamp(),
+        });
+      } catch (error) {
+        console.error("Error writing to Firestore: ", error);
+        toast({
+            variant: "destructive",
+            title: "Erro ao Salvar",
+            description: "Não foi possível salvar o registro no banco de dados.",
+        });
+      }
     };
 
     if (!navigator.geolocation) {
@@ -163,7 +169,7 @@ export default function CheckInPage() {
                 name="id"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>ID do Funcionário</FormLabel> TSC
+                    <FormLabel>ID do Funcionário</FormLabel>
                     <FormControl>
                       <div className="relative">
                         <Fingerprint className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -196,7 +202,7 @@ export default function CheckInPage() {
 
       <div className="w-full max-w-4xl mt-12">
         <h2 className="text-2xl font-headline font-bold text-center">Registro de Atividades</h2>
-        <ActivityLog logs={activityLog} />
+        <ActivityLog logs={activityLog || []} loading={logsLoading} />
       </div>
 
     </main>
