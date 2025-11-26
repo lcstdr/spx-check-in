@@ -4,7 +4,7 @@
 import { useMemo } from "react";
 import { collection, query, orderBy } from "firebase/firestore";
 import Link from 'next/link';
-import { Home, ShieldAlert } from 'lucide-react';
+import { Home, ShieldAlert, Users } from 'lucide-react';
 
 import { useFirestore, useCollection, useUser } from "@/firebase";
 import { ActivityLog, LogEntry } from "@/components/activity-log";
@@ -52,12 +52,20 @@ export default function AdminPage() {
     <main className="container mx-auto p-4 py-8 sm:p-12">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold">Painel do Administrador</h1>
-        <Link href="/">
-            <Button variant="outline">
-                <Home className="mr-2 h-4 w-4" />
-                Página de Check-in
-            </Button>
-        </Link>
+        <div className="flex gap-2">
+            <Link href="/">
+                <Button variant="outline">
+                    <Home className="mr-2 h-4 w-4" />
+                    Página de Check-in
+                </Button>
+            </Link>
+            <Link href="/admin/drivers">
+              <Button>
+                  <Users className="mr-2 h-4 w-4" />
+                  Gerenciar Motoristas
+              </Button>
+            </Link>
+        </div>
       </div>
       
       <div className="w-full max-w-6xl mx-auto">
