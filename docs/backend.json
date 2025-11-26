@@ -30,6 +30,30 @@
         }
       },
       "required": ["name", "id", "timestamp", "status", "details"]
+    },
+    "driver": {
+      "title": "Driver",
+      "description": "Represents a driver and their vehicle information.",
+      "type": "object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "The full name of the driver."
+        },
+        "id": {
+          "type": "string",
+          "description": "The unique ID for the driver (e.g., employee ID)."
+        },
+        "vehicle": {
+          "type": "string",
+          "description": "The model of the vehicle (e.g., 'Fiat Fiorino')."
+        },
+        "plate": {
+          "type": "string",
+          "description": "The license plate of the vehicle."
+        }
+      },
+      "required": ["name", "id", "vehicle", "plate"]
     }
   },
   "auth": {
@@ -41,6 +65,12 @@
         "$ref": "#/entities/log"
       },
       "description": "Stores individual check-in log entries."
+    },
+    "/drivers/{driverId}": {
+      "schema": {
+        "$ref": "#/entities/driver"
+      },
+      "description": "Stores driver information."
     }
   }
 }
