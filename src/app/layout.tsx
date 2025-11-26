@@ -5,7 +5,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   title: 'SPX CHECK-IN HUB MAUÁ LSP64',
-  description: 'Sistema de check-in por geolocalização para SPX Mauá LSP64',
+  description: 'INICIAL - Sistema de check-in por geolocalização para SPX Mauá LSP64',
 };
 
 export default function RootLayout({
