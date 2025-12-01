@@ -69,7 +69,7 @@ export default function AdminPage() {
       </div>
       
       <div className="w-full max-w-6xl mx-auto">
-        <h2 className="text-2xl font-headline font-bold text-center">Registro de Atividades</h2>
+        <h2 className="text-2xl font-headline font-bold text-center">Histórico de Check-in</h2>
         <ActivityLog logs={activityLog || []} loading={logsLoading} />
       </div>
     </main>

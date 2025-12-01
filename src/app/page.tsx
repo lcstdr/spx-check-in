@@ -163,7 +163,7 @@ export default function CheckInPage() {
           SPX CHECK-IN MAUÁ
         </h1>
         <p className="text-muted-foreground mt-2 max-w-md">
-          AJUSTE - MAUÁ LSP64 - Check-in automático por geolocalização para membros da equipe.
+          Sistema de check-in por geolocalização para membros da equipe.
         </p>
       </div>
 
