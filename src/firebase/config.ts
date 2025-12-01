@@ -2,7 +2,7 @@
 // The Firebase configuration will be populated by the backend.
 // You can find your web app's Firebase configuration in the
 // Firebase console.
-const firebaseConfig = {
+export const firebaseConfig = {
   apiKey: "AIzaSyBRwb2GCmmg1p7_879FX_fWP7Axk61kGEk",
   authDomain: "studio-4950713027-a8370.firebaseapp.com",
   projectId: "studio-4950713027-a8370",
